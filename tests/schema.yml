@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: mart_cml_agmt_proc_snpsht
+    description: "Test suite for final mart snapshot model. Ensures all business logic, mappings, and joins are functioning as specified."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [AGMT_ANCHR_ID]
+      - dbt_utils.expression_is_true:
+          expression: "case when POL_NBR is null then 0 else 1 end = 1"
+          name: "not_null_pol_nbr"
+          severity: error
+      - dbt_utils.expression_is_true:
+          expression: "MAX_DED_AMT >= 0"
+          name: "max_ded_amt_non_negative"
+      - dbt_utils.expression_is_true:
+          expression: "MAX_DED_CD in ('N', 'L', 'M', 'H')"
+          name: "max_ded_cd_valid_enum"
+      - dbt_utils.expression_is_true:
+          expression: "ULT_POL_NBR is not null"
+          name: "ult_pol_nbr_not_null"
+      - dbt_utils.expression_is_true:
+          expression: "TYP_INS_IND in ('F', 'P')"
+          name: "typ_ins_ind_valid_codes"
+      - dbt_utils.expression_is_true:
+          expression: "CAPTV_IND in ('Y','N')"
+          name: "captv_ind_y_n"
+      - dbt_utils.expression_is_true:
+          expression: "UNCLCT_DED_POL_IND in ('Y','N')"
+          name: "unclct_ded_pol_ind_y_n"
+      - dbt_utils.expression_is_true:
+          expression: "NEW_USED_PLN_CD in ('0', 'N', 'U')"
+          name: "new_used_pln_cd_allowed"
+      - dbt_utils.expression_is_true:
+          expression: "len(POL_NBR) > 0"
+          name: "pol_nbr_not_empty"

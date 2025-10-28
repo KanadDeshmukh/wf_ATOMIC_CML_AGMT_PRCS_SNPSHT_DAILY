@@ -1,0 +1,91 @@
+version: 2
+
+models:
+  - name: stg_cml_agmt
+    description: "Staging model for CML_AGMT. Extracts raw fact rows, cleans, and exposes all required agreement columns for mart."
+    columns:
+      - name: AGMT_ANCHR_ID
+        description: "Unique anchor ID for agreement row."
+        tests: [not_null]
+      - name: POL_NBR
+        description: "Policy Number, clean trimmed as source."
+      - name: POL_EFF_DT
+        description: "Policy Effective Date."
+      # Other fields... (full list omitted for brevity)
+  - name: stg_finc_servs_rol
+    description: "Staging for FINC_SERVS_ROL dimension; cleaned for INSURER/POLICY_ADMINISTRATOR joins."
+    columns:
+      - name: ROL_PLYR_ANCHR_ID
+        description: "Role player anchor ID (natural key)."
+      - name: ROL_TYP_CD
+        description: "Role Type Code: INSURER/POLICY_ADMINISTRATOR."
+      # ...
+  - name: stg_inmy_agmt
+    description: "INMY_AGMT raw table staging; enables native agreement fields and enrichment."
+    columns:
+      - name: INMY_AGMT_ANCHR_ID
+      - name: EXTL_REFR_CD_NTV_SRC_CD
+      # ...
+  - name: stg_pol_ded_plan
+    description: "Deductible plan types, effective-dated, for bucketed max deductible logic in mart."
+    columns:
+      - name: POL_ANCHR_ID
+      - name: DED_PLN_TYP_CD
+      - name: MAX_DED_AMT
+      # ...
+  - name: stg_rol_plyr_cat_rel
+    description: "Role-player category relationships, for group enrichments (MARKET_BASKET/ACTUARIAL)."
+    columns:
+      - name: ROL_PLYR_ANCHR_ID
+      - name: NTR_ID
+      - name: EXTL_REFR_CD
+      # ...
+  - name: stg_extl_org
+    description: "External org hierarchy reference staging."
+    columns:
+      - name: ROL_PLYR_ANCHR_ID
+      - name: OPERT_CO_CD
+      # ...
+  - name: stg_int_org_rlup
+    description: "Internal org rollup, low-level org assignment/enrichment."
+    columns:
+      - name: LOW_LVL_ORG_ID
+      - name: SBU_SSU_ID
+      # ...
+  - name: stg_int_org_rlup_mm_snpsht_bu_id
+    description: "Org rollup (snapshot for MM/BU) per reference."
+    columns:
+      - name: LOW_LVL_ORG_ID
+      - name: BU_ID
+      # ...
+  - name: stg_veh_mk_mdl_nw_usd_ind
+    description: "Extract vehicle new/used and make/model indicators for policy enrichment."
+    columns:
+      - name: ANCHR_ID
+      - name: NEW_USED_IND
+      - name: MK_MD_ID
+      # ...
+  - name: stg_fsp
+    description: "Financial Services Product reference staging."
+    columns:
+      - name: EXTL_REFR_CD_FSP
+      - name: NM_FSP
+      - name: MKT_PRD_SPEC_ID
+      # ...
+  - name: stg_additional_reference
+    description: "Staging for any additional reference/work/control tables needed for lookups as in original mapping."
+    columns:
+      - name: ...
+  - name: mart_cml_agmt_proc_snpsht
+    description: |
+      Final snapshot mart for CML_AGMT_PROC_SNPSHT, joining all staged sources and applying all business, group, org, policy, and enrichment logic per Informatica. All chained lookup/expression logic is implemented herein. Table is overwritten daily by truncate-insert. See column descriptions for details.
+    columns:
+      - name: AGMT_ANCHR_ID
+        description: "Unique anchor ID for agreement row. Passed through or resolved via expression as in mapping."
+      - name: POL_NBR
+        description: "Policy Number, cleaned and conditionally replaced by ultimate policy where required."
+      - name: POL_EFF_DT
+        description: "Policy Effective Date."
+      - name: TYP_ID
+        description: "Type identifier for agreement row."
+      # ... (all target columns as in mapping, with brief descriptions)

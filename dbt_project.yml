@@ -1,0 +1,19 @@
+name: 'cml_agmt_proc_snpsht'
+version: '1.0'
+profile: 'databricks_profile'
+config-version: 2
+
+docs-paths: ["docs"]
+model-paths: ["models"]
+seed-paths: ["seeds"]
+data-paths: ["data"]
+macro-paths: ["macros"]
+target-path: "target"
+
+models:
+  cml_agmt_proc_snpsht:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+      +incremental_strategy: insert_overwrite
